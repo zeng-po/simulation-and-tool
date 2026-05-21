@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <!-- 確保網頁在手機、平板等行動裝置上也能正確縮放顯示 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的作品集 - 物理模擬與程式小工具</title>
+    
+    <style>
+        /* ==========================================================================
+           全域樣式設定 (CSS)
+           ========================================================================== */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f6f8fa; /* 類似 GitHub 的淺灰色背景 */
+            color: #24292e;           /* 深灰色文字，閱讀舒適 */
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 網頁上方的標題區塊 */
+        header {
+            background-color: #24292e; /* 深色背景 */
+            color: #ffffff;           /* 白色文字 */
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        /* 主要內容容器，限制最大寬度並居中 */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* 區塊包裝：用來放「物理模擬」和「程式小工具」兩大分類 */
+        .category-section {
+            background-color: #ffffff; /* 白色背景卡片 */
+            border: 1px solid #e1e4e8;   /* 淡淡的灰色邊框 */
+            border-radius: 6px;         /* 圓角 */
+            padding: 1.5rem;
+            margin-bottom: 2rem;        /* 區塊與區塊之間的間距 */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* 微弱的陰影 */
+        }
+
+        /* 分類標題樣式 (如：物理模擬) */
+        .category-title {
+            font-size: 1.5rem;
+            color: #0366d6;             /* 科技感藍色 */
+            border-bottom: 2px solid #e1e4e8;
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+        }
+
+        /* 連結列表的容器 (移除預設的清單黑點與縮排) */
+        .link-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0 0 0;
+        }
+
+        /* 每個連結項目的排列樣式 */
+        .link-item {
+            margin-bottom: 0.8rem;
+        }
+
+        /* ==========================================================================
+           超連結 (a 標籤) 的樣式設計
+           ========================================================================== */
+        .project-link {
+            display: inline-block;
+            color: #0366d6;           /* 預設藍色 */
+            text-decoration: none;    /* 移除超連結下底線 */
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: color 0.2s ease; /* 讓滑鼠懸停時的顏色變化更平滑 */
+        }
+
+        /* 當滑鼠移到超連結上方時的視覺效果 */
+        .project-link:hover {
+            color: #0056b3;           /* 變成深藍色 */
+            text-decoration: underline; /* 顯現下底線，提示使用者可點擊 */
+        }
+
+        /* 專案的簡短說明文字樣式 */
+        .project-desc {
+            display: block;
+            color: #586069;           /* 較淡的灰色，用於副標題或說明 */
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+        }
+
+        /* 頁尾樣式 */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #6a737d;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 網頁頂部：主標題 -->
+    <header>
+        <h1>我的 GitHub 作品集</h1>
+        <p>這裡記錄了我開發的物理模擬專案與程式實用小工具</p>
+    </header>
+
+    <!-- 主要內容區 -->
+    <div class="container">
+
+        <!-- ==========================================================================
+             第一部分：物理模擬 (Physics Simulations)
+             ========================================================================== -->
+        <section class="category-section">
+            <h2 class="category-title">🌌 物理模擬</h2>
+            <ul class="link-list">
+                
+                <!-- 連結項目 1 -->
+                <li class="link-item">
+                    <!-- 
+                      【填寫說明】：
+                      - href="..." 裡面填寫你要連過去的網頁路徑。
+                        例如同一目錄下的單擺模擬網頁叫 pendulum.html，就填 href="pendulum.html"
+                        如果是另一個資料夾，可以寫 href="./physics/pendulum.html"
+                      - 🛠️ 目前先用 "javascript:void(0);" 代替，代表點了不會有反應，等你之後修改。
+                    -->
+                    <a href="javascript:void(0);" class="project-link">雙擺混沌系統模擬 (Double Pendulum)</a>
+                    <span class="project-desc">使用 Runge-Kutta 演算法模擬雙擺的混沌運動軌跡，支援即時調整質量與擺長。</span>
+                </li>
+
+                <!-- 連結項目 2 -->
+                <li class="link-item">
+                    <a href="javascript:void(0);" class="project-link">萬有引力多體運動 (N-Body Simulation)</a>
+                    <span class="project-desc">模擬多個星體在太空中受萬有引力相互影響的動態，包含碰撞融合機制。</span>
+                </li>
+                
+            </ul>
+        </section>
+
+        <!-- ==========================================================================
+             第二部分：程式小工具 (Coding Toolkits)
+             ========================================================================== -->
+        <section class="category-section">
+            <h2 class="category-title">🛠️ 程式小工具</h2>
+            <ul class="link-list">
+                
+                <!-- 連結項目 1 -->
+                <li class="link-item">
+                    <!-- 
+                      【填寫說明】：
+                      - 如果你有些工具放在子資料夾，例如叫 tools/color-picker.html
+                      - 你的 href 就可以寫成 href="tools/color-picker.html"
+                    -->
+                    <a href="javascript:void(0);" class="project-link">網頁前端色碼擷取器</a>
+                    <span class="project-desc">快速轉換 HEX、RGB、HSL 顏色格式，並支援一鍵複製色碼與產生漸層配色。</span>
+                </li>
+
+                <!-- 連結項目 2 -->
+                <li class="link-item">
+                    <a href="javascript:void(0);" class="project-link">Markdown 表格自動生成器</a>
+                    <span class="project-desc">將 Excel 或 CSV 資料複製貼上，一鍵轉換為 GitHub README 適用的 Markdown 表格。</span>
+                </li>
+
+            </ul>
+        </section>
+
+    </div>
+
+    <!-- 網頁底部 -->
+    <footer>
+        <p>© 2026 Powered by GitHub Pages | 保持好奇，持續推動程式碼</p>
+    </footer>
+
+</body>
+</html>
