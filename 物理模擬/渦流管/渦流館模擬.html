@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+
+<!-- 手機版縮放設定 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>顆粒流渦流管截面</title>
+
+<style>
+
+/* =========================
+   基本頁面設定
+========================= */
+html, body 
+{
+    margin: 0;
+    overflow: hidden;
+    background: #020611;
+}
+
+/* canvas 全螢幕 */
+canvas 
+{
+    display:block;
+}
+
+/* 左上資訊框 */
+.info
+{
+    position:absolute;
+    top:12px;
+    left:12px;
+
+    color:white;
+    background:rgba(0,0,0,0.35);
+
+    padding:12px 16px;
+    border-radius:12px;
+
+    font-family:sans-serif;
+    font-size:14px;
+    line-height:1.6;
+
+    backdrop-filter: blur(4px);
+}
+
+/* 左下按鈕區 */
+.controls
+{
+    position:absolute;
+    bottom:12px;
+    left:12px;
+
+    display:flex;
+    gap:8px;
+}
+
+/* 按鈕樣式 */
+button
+{
+    padding:8px 12px;
+    border-radius:10px;
+    border:none;
+
+    cursor:pointer;
+    font-size:14px;
+
+    background:#1c2a4a;
+    color:white;
+}
+
+button:hover
+{
+    background:#2a3d6b;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- 左上角說明 -->
+<div class="info">
+紅 / 藍速度顏色<br>
+暫停 + 重新開始
+</div>
+
+<!-- 控制按鈕 -->
+<div class="controls">
+
+    <!-- 暫停 / 繼續 -->
+    <button id="toggle">⏸ Pause</button>
+
+    <!-- 重置 -->
+    <button id="reset">🔁 Restart Market</button>
+
+</div>
+
+<!-- 畫布 -->
+<canvas id="c"></canvas>
+
+<script>
+
+// 取得 canvas
+const canvas = document.getElementById("c");
+
+/* 
+   2D 繪圖環境
+   之後所有繪圖都透過 ctx 進行
+*/
+const ctx = canvas.getContext("2d");
+
+
+// ==========================
+// 畫面尺寸
+// ==========================
+
+let W,H;
+
+/*
+   resize()
+   當視窗改變時同步調整 canvas 尺寸
+*/
+function resize()
+{
+
+    W = canvas.width = innerWidth;
+    H = canvas.height = innerHeight;
+}
+
+/* 視窗縮放時重新設定 */
+window.addEventListener("resize", resize);
+
+/* 初始執行 */
+resize();
+
+
+// ==========================
+// 圓心座標
+// ==========================
+
+const CENTER = {
+
+    /* 中心 X */
+    x: () => W/2,
+
+    /* 中心 Y */
+    y: () => H/2
+};
+
+
+// ==========================
+// 全域設定
+// ==========================
+
+
+const RADIUS = 320;   /* 大圓半徑 */
+
+const COUNT = 420;    /* 粒子數量 */
+
+let particles = [];   /* 所有粒子 */
+
+let paused = false;   /* 是否暫停 */
+
+
+// ==========================
+// Particle 類別
+// ==========================
+
+class Particle 
+{
+
+    constructor()
+    {        
+        this.init();    // 建立時初始化
+    }
+
+    /*
+       初始化粒子
+    */
+    init()
+    {
+        const a = Math.random() * Math.PI * 2;                // 隨機角度
+        const r = (Math.random() ** 0.15) * (RADIUS - 10);    // 隨機半徑（平方根讓分布平均）
+
+        // 初始位置
+        this.x = CENTER.x() + Math.cos(a) * r;
+        this.y = CENTER.y() + Math.sin(a) * r;
+
+        /*
+           切線方向
+           讓粒子繞圈旋轉
+        */
+        const tx = -Math.sin(a);
+        const ty =  Math.cos(a);
+
+        /*
+           外圈速度較快
+        */
+        const speed = 2 + 6 * (r / RADIUS);
+
+        // 初始速度
+        this.vx = tx * speed;
+        this.vy = ty * speed;
+        
+        this.radius = 2 + Math.random() * 2;    // 粒子大小
+        this.mass = this.radius * this.radius;  // 質量（面積概念）
+        this.history = [];                      // 軌跡紀錄
+    }
+
+    /*
+       更新粒子
+    */
+    update()
+    {
+
+        // 移動
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // 與中心距離
+        const dx = this.x - CENTER.x();
+        const dy = this.y - CENTER.y();
+
+        const dist = Math.hypot(dx, dy);
+
+        // 邊界限制
+        const limit = RADIUS - this.radius;
+
+        /*
+           如果超出大圓
+           進行反射
+        */
+        if(dist > limit){
+
+            // 法向量
+            const nx = dx / dist;
+            const ny = dy / dist;
+
+            // 拉回邊界
+            this.x = CENTER.x() + nx * limit;
+            this.y = CENTER.y() + ny * limit;
+
+            /*
+               向量反射公式
+            */
+            const dot = this.vx * nx + this.vy * ny;
+
+            this.vx -= 2 * dot * nx;
+            this.vy -= 2 * dot * ny;
+        }
+
+        // 紀錄軌跡
+        this.history.push({
+            x:this.x,
+            y:this.y
+        });
+
+        // 速度大小
+        const speed = Math.hypot(this.vx, this.vy);
+
+        /*
+           速度越快
+           軌跡越長
+        */
+        const trail = Math.min(30, 3 + speed * 3);
+
+        // 控制軌跡長度
+        while(this.history.length > trail)
+        {
+            this.history.shift();
+        }
+    }
+
+    /*
+       繪製粒子
+    */
+    draw(){
+
+        // 計算速度
+        const speed = Math.hypot(this.vx, this.vy);
+
+        /*
+           速度顏色判斷
+           快 = 紅
+           慢 = 藍
+        */
+        const FAST_THRESHOLD = 5.3;    //速度顏色分界值
+
+        const hue = speed > FAST_THRESHOLD ? 0 : 220;
+
+        // 畫軌跡
+        for(let i=1;i<this.history.length;i++){
+
+            const p1 = this.history[i-1];
+            const p2 = this.history[i];
+
+            // 尾巴透明度
+            const alpha = i / this.history.length;
+
+            ctx.beginPath();
+
+            ctx.moveTo(p1.x,p1.y);
+            ctx.lineTo(p2.x,p2.y);
+
+            ctx.strokeStyle =
+                `hsla(${hue},100%,60%,${alpha})`;
+
+            ctx.lineWidth = this.radius * alpha;
+
+            ctx.stroke();
+        }
+
+        // 畫粒子本體
+        ctx.beginPath();
+
+        ctx.arc(
+            this.x,
+            this.y,
+            this.radius,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fillStyle =
+            `hsla(${hue},100%,65%,1)`;
+
+        ctx.fill();
+    }
+}
+
+
+// ==========================
+// 建立粒子
+// ==========================
+
+function createParticles(){
+
+    particles = [];
+
+    for(let i=0;i<COUNT;i++){
+
+        particles.push(
+            new Particle()
+        );
+    }
+}
+
+/* 初始建立 */
+createParticles();
+
+
+// ==========================
+// 粒子碰撞
+// ==========================
+
+function collide(){
+
+    // 雙重迴圈檢查每對粒子
+    for(let i=0;i<particles.length;i++){
+
+        const a = particles[i];
+
+        for(let j=i+1;j<particles.length;j++){
+
+            const b = particles[j];
+
+            // 粒子距離向量
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+
+            // 距離
+            const dist = Math.hypot(dx,dy);
+
+            // 最小接觸距離
+            const min = a.radius + b.radius;
+
+            /*
+               發生碰撞
+            */
+            if(dist < min && dist > 0){
+
+                // 法向量
+                const nx = dx / dist;
+                const ny = dy / dist;
+
+                /*
+                   重疊修正
+                   防止卡住
+                */
+                const overlap = min - dist;
+
+                const total = a.mass + b.mass;
+
+                a.x -= nx * overlap * (b.mass/total);
+                a.y -= ny * overlap * (b.mass/total);
+
+                b.x += nx * overlap * (a.mass/total);
+                b.y += ny * overlap * (a.mass/total);
+
+                /*
+                   相對速度
+                */
+                const rvx = b.vx - a.vx;
+                const rvy = b.vy - a.vy;
+
+                // 法向速度
+                const vn = rvx*nx + rvy*ny;
+
+                // 已遠離就跳過
+                if(vn > 0) continue;
+
+                /*
+                   完全彈性碰撞 impulse
+                */
+                const j =
+                    -(2 * vn) /
+                    (1/a.mass + 1/b.mass);
+
+                const ix = j * nx;
+                const iy = j * ny;
+
+                // 更新速度
+                a.vx -= ix / a.mass;
+                a.vy -= iy / a.mass;
+
+                b.vx += ix / b.mass;
+                b.vy += iy / b.mass;
+            }
+        }
+    }
+}
+
+
+// ==========================
+// 主動畫迴圈
+// ==========================
+
+function animate()
+{
+    requestAnimationFrame(animate);
+
+    // 暫停時停止更新
+    if(paused) return;
+
+    /*
+       半透明背景
+       製造殘影效果
+    */
+    ctx.fillStyle = "rgba(2,6,17,0.12)";
+    ctx.fillRect(0,0,W,H);
+
+    // 畫大圓邊界
+    ctx.beginPath();
+
+    ctx.arc(
+        CENTER.x(),
+        CENTER.y(),
+        RADIUS,
+        0,
+        Math.PI*2
+    );
+
+    ctx.strokeStyle = "rgba(120,180,255,0.9)";
+    ctx.lineWidth = 4;
+
+    ctx.stroke();
+
+    // 更新粒子
+    particles.forEach(p=>p.update());
+
+    // 粒子碰撞
+    collide();
+
+    // 繪製粒子
+    particles.forEach(p=>p.draw());
+}
+
+/* 啟動動畫 */
+animate();
+
+
+// ==========================
+// 控制按鈕
+// ==========================
+
+/*   暫停 / 繼續  */
+document.getElementById("toggle").onclick = (e)=>
+{
+    paused = !paused;
+    e.target.textContent =
+        paused
+        ? "▶ Resume"
+        : "⏸ Pause";
+};
+
+
+/*   重新開市（重置）*/
+document.getElementById("reset").onclick = ()=>
+{
+    paused = false;
+    document.getElementById("toggle").textContent =
+        "⏸ Pause";
+
+    // 重新建立粒子
+    createParticles();
+};
+
+</script>
+
+</body>
+</html>
