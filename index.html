@@ -27,16 +27,17 @@
             margin: 0;                        /* 移除瀏覽器預設外距 */
             padding: 0;                       /* 移除瀏覽器預設內距 */
         }
+
         /* 網頁上方的標題區塊 */
         header 
         {
-            background-color: #24292e; /* 深色背景 */
-            backdrop-filter: blur(12px); /*透明霧面*/
-            color: #ffffff;           /* 白色文字 */
+            background-color: #24292e;  /* 深色背景 */
+            backdrop-filter: blur(12px);  /*透明霧面*/
+            color: #ffffff;             /* 白色文字 */
             text-align: center;
             padding: 2rem 1rem;
         }
-
+       
         /* 主要內容容器，限制最大寬度並居中 */
         .container 
         {
@@ -44,7 +45,7 @@
             margin: 2rem auto;
             padding: 0 1rem;
         }
-
+       
         /* 區塊包裝：用來放「物理模擬」和「程式小工具」兩大分類 */
         .category-section 
         {
@@ -56,6 +57,7 @@
             margin-bottom: 2rem;                            /* 區塊間距 */
             box-shadow: 0 8px 32px rgba(0,0,0,0.2);       /* 更柔和陰影 */
         }
+      
         /* 分類標題樣式 (如：物理模擬) */
         .category-title 
         {
@@ -65,7 +67,7 @@
             padding-bottom: 0.5rem;
             margin-top: 0;
         }
-
+      
         /* 連結列表的容器 (移除預設的清單黑點與縮排) */
         .link-list 
         {
@@ -73,7 +75,7 @@
             padding: 0;
             margin: 1rem 0 0 0;
         }
-
+      
         /* 每個連結項目的排列樣式 */
         .link-item 
         {
@@ -86,30 +88,33 @@
         .project-link 
         {
             display: inline-block;
-            color: #FFFFFF;           /* 預設白色 */
-            text-decoration: none;    /* 移除超連結下底線 */
+            color: #FFFFFF;            /* 預設白色 */
+            text-decoration: none;       /* 移除超連結下底線 */
             font-weight: 500;
             font-size: 1.1rem;
             transition: color 0.2s ease; /* 讓滑鼠懸停時的顏色變化更平滑 */
         }
-
+      
         /* 當滑鼠移到超連結上方時的視覺效果 */
-        .project-link:hover {
-            color: #0056b3;           /* 變成深藍色 */
-            text-decoration: none;      /* 移除超連結下底線 */
+        .project-link:hover 
+        {
+            color: #0056b3;               /* 變成深藍色 */
+            text-decoration: none;          /* 移除超連結下底線 */
             /*text-decoration: underline;*/ /* 顯現下底線，提示使用者可點擊 */
         }
 
         /* 專案的簡短說明文字樣式 */
-        .project-desc {
+        .project-desc 
+        {
             display: block;
-            color: #586069;           /* 較淡的灰色，用於副標題或說明 */
+            color: #000000;           /* 較淡的灰色，用於副標題或說明 */
             font-size: 0.9rem;
             margin-top: 0.2rem;
         }
 
         /* 頁尾樣式 */
-        footer {
+        footer 
+        {
             text-align: center;
             padding: 2rem;
             color: #6a737d;
@@ -144,8 +149,8 @@
                         如果是另一個資料夾，可以寫 href="./physics/pendulum.html"
                       - 🛠️ 目前先用 "javascript:void(0);" 代替，代表點了不會有反應，等你之後修改。
                     -->
-                    <a href="javascript:void(0);" class="project-link">雙擺混沌系統模擬 (Double Pendulum)</a>
-                    <span class="project-desc">使用 Runge-Kutta 演算法模擬雙擺的混沌運動軌跡，支援即時調整質量與擺長。</span>
+                    <a href="./物理模擬/渦流管/渦流館模擬.html" target="_blank" rel="noopener noreferrer" class="project-link">渦流管截面顆粒流模擬 (Vortex Tube)</a>
+                    <span class="project-desc">使用粒子流模擬渦流管內部空氣粒子運動軌跡，並用顏色區份速度，速度快代表溫度高。</span>
                 </li>
 
                 <!-- 連結項目 2 -->
