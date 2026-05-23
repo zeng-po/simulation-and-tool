@@ -69,6 +69,7 @@ button
 
     background:#1c2a4a;
     color:white;
+    transition: background 0.2s;
 }
 
 button:hover
@@ -90,8 +91,11 @@ button:hover
 <!-- 控制按鈕 -->
 <div class="controls">
 
-    <!-- 暫停 / 繼續 -->
-    <button id="toggle">⏸ Pause</button>
+    <!-- 啟動 / 暫停 / 繼續 -->
+    <button id="toggle">▶ Start</button>
+
+    <!-- 切換尾巴特效 -->
+    <button id="trailToggle">💫 Disable Trail</button>
 
     <!-- 重置 -->
     <button id="reset">🔁 Restart Market</button>
@@ -125,7 +129,6 @@ let W,H;
 */
 function resize()
 {
-
     W = canvas.width = innerWidth;
     H = canvas.height = innerHeight;
 }
@@ -155,14 +158,15 @@ const CENTER = {
 // 全域設定
 // ==========================
 
-
 const RADIUS = 320;   /* 大圓半徑 */
 
 const COUNT = 420;    /* 粒子數量 */
 
 let particles = [];   /* 所有粒子 */
 
-let paused = false;   /* 是否暫停 */
+let paused = true;   /* 初始設為暫停，由 Start 鍵啟動 */
+
+let showTrail = true; /* 是否顯示尾巴 */
 
 
 // ==========================
@@ -171,7 +175,6 @@ let paused = false;   /* 是否暫停 */
 
 class Particle 
 {
-
     constructor()
     {        
         this.init();    // 建立時初始化
@@ -205,7 +208,7 @@ class Particle
         this.vx = tx * speed;
         this.vy = ty * speed;
         
-        this.radius = 2 + Math.random() * 2;    // 粒子大小
+        this.radius = 3;                        // 粒子大小
         this.mass = this.radius * this.radius;  // 質量（面積概念）
         this.history = [];                      // 軌跡紀錄
     }
@@ -215,7 +218,6 @@ class Particle
     */
     update()
     {
-
         // 移動
         this.x += this.vx;
         this.y += this.vy;
@@ -291,26 +293,28 @@ class Particle
 
         const hue = speed > FAST_THRESHOLD ? 0 : 220;
 
-        // 畫軌跡
-        for(let i=1;i<this.history.length;i++){
+        // 畫軌跡 (只有在 showTrail 為 true 時才繪製)
+        if (showTrail) {
+            for(let i=1;i<this.history.length;i++){
 
-            const p1 = this.history[i-1];
-            const p2 = this.history[i];
+                const p1 = this.history[i-1];
+                const p2 = this.history[i];
 
-            // 尾巴透明度
-            const alpha = i / this.history.length;
+                // 尾巴透明度
+                const alpha = i / this.history.length;
 
-            ctx.beginPath();
+                ctx.beginPath();
 
-            ctx.moveTo(p1.x,p1.y);
-            ctx.lineTo(p2.x,p2.y);
+                ctx.moveTo(p1.x,p1.y);
+                ctx.lineTo(p2.x,p2.y);
 
-            ctx.strokeStyle =
-                `hsla(${hue},100%,60%,${alpha})`;
+                ctx.strokeStyle =
+                    `hsla(${hue},100%,60%,${alpha})`;
 
-            ctx.lineWidth = this.radius * alpha;
+                ctx.lineWidth = this.radius * alpha;
 
-            ctx.stroke();
+                ctx.stroke();
+            }
         }
 
         // 畫粒子本體
@@ -356,8 +360,8 @@ createParticles();
 // 粒子碰撞
 // ==========================
 
-function collide(){
-
+function collide()
+{
     // 雙重迴圈檢查每對粒子
     for(let i=0;i<particles.length;i++){
 
@@ -442,14 +446,14 @@ function animate()
 {
     requestAnimationFrame(animate);
 
-    // 暫停時停止更新
+    // 暫停時停止更新（但仍會持續渲染畫面，避免切換開關時卡死）
     if(paused) return;
 
     /*
        半透明背景
-       製造殘影效果
+       製造殘影效果（若關閉尾巴，改用全黑不留殘影）
     */
-    ctx.fillStyle = "rgba(2,6,17,0.12)";
+    ctx.fillStyle = showTrail ? "rgba(2,6,17,0.12)" : "rgba(2,6,17,1)";
     ctx.fillRect(0,0,W,H);
 
     // 畫大圓邊界
@@ -481,31 +485,75 @@ function animate()
 /* 啟動動畫 */
 animate();
 
+// 初始單次渲染（讓一開始暫停時也能看到初始圓圈與粒子）
+ctx.fillStyle = "rgba(2,6,17,1)";
+ctx.fillRect(0,0,W,H);
+ctx.beginPath();
+ctx.arc(CENTER.x(), CENTER.y(), RADIUS, 0, Math.PI*2);
+ctx.strokeStyle = "rgba(120,180,255,0.9)";
+ctx.lineWidth = 4;
+ctx.stroke();
+particles.forEach(p=>p.draw());
+
 
 // ==========================
 // 控制按鈕
 // ==========================
 
-/*   暫停 / 繼續  */
-document.getElementById("toggle").onclick = (e)=>
+/*   開始 / 暫停 / 繼續  */
+const toggleBtn = document.getElementById("toggle");
+let isFirstStart = true; // 追蹤是否為第一次啟動
+
+toggleBtn.onclick = (e) =>
 {
     paused = !paused;
-    e.target.textContent =
-        paused
-        ? "▶ Resume"
-        : "⏸ Pause";
+    
+    if (paused) {
+        e.target.textContent = "▶ Resume";
+    } else {
+        isFirstStart = false;
+        e.target.textContent = "⏸ Pause";
+    }
 };
 
-
-/*   重新開市（重置）*/
-document.getElementById("reset").onclick = ()=>
+/*   切換尾巴顯示狀態  */
+document.getElementById("trailToggle").onclick = (e) => 
 {
-    paused = false;
-    document.getElementById("toggle").textContent =
-        "⏸ Pause";
+    showTrail = !showTrail;
+    e.target.textContent = showTrail ? "💫 Disable Trail" : "⭐ Enable Trail";
+    
+    // 如果在暫停期間切換，立即刷新一次畫布讓視覺更新
+    if (paused) {
+        ctx.fillStyle = "rgba(2,6,17,1)";
+        ctx.fillRect(0,0,W,H);
+        ctx.beginPath();
+        ctx.arc(CENTER.x(), CENTER.y(), RADIUS, 0, Math.PI*2);
+        ctx.strokeStyle = "rgba(120,180,255,0.9)";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        particles.forEach(p=>p.draw());
+    }
+};
+
+/*   重新開始（重置）*/
+document.getElementById("reset").onclick = () =>
+{
+    paused = true; // 重置後回到初始待命狀態
+    isFirstStart = true;
+    toggleBtn.textContent = "▶ Start";
 
     // 重新建立粒子
     createParticles();
+    
+    // 清除畫布並重新繪製初始狀態
+    ctx.fillStyle = "rgba(2,6,17,1)";
+    ctx.fillRect(0,0,W,H);
+    ctx.beginPath();
+    ctx.arc(CENTER.x(), CENTER.y(), RADIUS, 0, Math.PI*2);
+    ctx.strokeStyle = "rgba(120,180,255,0.9)";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    particles.forEach(p=>p.draw());
 };
 
 </script>
