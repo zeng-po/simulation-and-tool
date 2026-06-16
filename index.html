@@ -1,120 +1,138 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <!-- 確保網頁在手機、平板等行動裝置上也能正確縮放顯示 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>物理模擬與程式小工具</title>
-    
+
     <style>
         /* ==========================================================================
            全域樣式設定 (CSS)
            ========================================================================== */
 
-        body 
-        {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;    /* 設定網頁字體（macOS / Windows / 手機都會有較漂亮的顯示效果） */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* 設定網頁字體（macOS / Windows / 手機都會有較漂亮的顯示效果） */
 
-            background-image: url("images/background.jpg");     /* 設定背景圖片 */
+            background-image: url("images/background.jpg");
+            /* 設定背景圖片 */
 
-            background-size: cover;           /* 讓背景圖片自動填滿整個畫面 */
-            background-position: center;      /* 背景圖片置中 */
-            background-repeat: no-repeat;     /* 不重複平鋪圖片 */
-            background-attachment: fixed;     /* 捲動網頁時，背景固定不動（有視差感） */
+            background-size: cover;
+            /* 讓背景圖片自動填滿整個畫面 */
+            background-position: center;
+            /* 背景圖片置中 */
+            background-repeat: no-repeat;
+            /* 不重複平鋪圖片 */
+            background-attachment: fixed;
+            /* 捲動網頁時，背景固定不動（有視差感） */
 
-            color: #24292e;                 /* 網頁文字顏色 */
-            line-height: 1.6;                 /* 行距，讓文字更好閱讀 */
-            margin: 0;                        /* 移除瀏覽器預設外距 */
-            padding: 0;                       /* 移除瀏覽器預設內距 */
+            color: #24292e;
+            /* 網頁文字顏色 */
+            line-height: 1.6;
+            /* 行距，讓文字更好閱讀 */
+            margin: 0;
+            /* 移除瀏覽器預設外距 */
+            padding: 0;
+            /* 移除瀏覽器預設內距 */
         }
 
         /* 網頁上方的標題區塊 */
-        header 
-        {
-            background-color: #24292e;  /* 深色背景 */
-            backdrop-filter: blur(12px);  /*透明霧面*/
-            color: #ffffff;             /* 白色文字 */
+        header {
+            background-color: #24292e;
+            /* 深色背景 */
+            backdrop-filter: blur(12px);
+            /*透明霧面*/
+            color: #ffffff;
+            /* 白色文字 */
             text-align: center;
             padding: 2rem 1rem;
         }
-       
+
         /* 主要內容容器，限制最大寬度並居中 */
-        .container 
-        {
+        .container {
             max-width: 1000px;
             margin: 2rem auto;
             padding: 0 1rem;
         }
-       
+
         /* 區塊包裝：用來放「物理模擬」和「程式小工具」兩大分類 */
-        .category-section 
-        {
-            backdrop-filter: blur(20px);                    /* 背景模糊（毛玻璃效果） */
-            background-color: rgba(255, 255, 255, 0.35);  /* 半透明白色 */
-            border: 1px solid rgba(255,255,255,0.2);      /* 半透明白色邊框 */
-            border-radius: 35px;                            /* 圓角 */
-            padding: 1.5rem;                                /* 內距 */
-            margin-bottom: 2rem;                            /* 區塊間距 */
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);       /* 更柔和陰影 */
+        .category-section {
+            backdrop-filter: blur(20px);
+            /* 背景模糊（毛玻璃效果） */
+            background-color: rgba(255, 255, 255, 0.35);
+            /* 半透明白色 */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            /* 半透明白色邊框 */
+            border-radius: 35px;
+            /* 圓角 */
+            padding: 1.5rem;
+            /* 內距 */
+            margin-bottom: 2rem;
+            /* 區塊間距 */
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            /* 更柔和陰影 */
         }
-      
+
         /* 分類標題樣式 (如：物理模擬) */
-        .category-title 
-        {
+        .category-title {
             font-size: 1.5rem;
-            color: #FFFFFF;             /* 科技感白色 */
+            color: #FFFFFF;
+            /* 科技感白色 */
             border-bottom: 2px solid #e1e4e8;
             padding-bottom: 0.5rem;
             margin-top: 0;
         }
-      
+
         /* 連結列表的容器 (移除預設的清單黑點與縮排) */
-        .link-list 
-        {
+        .link-list {
             list-style: none;
             padding: 0;
             margin: 1rem 0 0 0;
         }
-      
+
         /* 每個連結項目的排列樣式 */
-        .link-item 
-        {
+        .link-item {
             margin-bottom: 0.8rem;
         }
 
         /* ==========================================================================
            超連結 (a 標籤) 的樣式設計
            ========================================================================== */
-        .project-link 
-        {
+        .project-link {
             display: inline-block;
-            color: #FFFFFF;            /* 預設白色 */
-            text-decoration: none;       /* 移除超連結下底線 */
+            color: #FFFFFF;
+            /* 預設白色 */
+            text-decoration: none;
+            /* 移除超連結下底線 */
             font-weight: 500;
             font-size: 1.1rem;
-            transition: color 0.2s ease; /* 讓滑鼠懸停時的顏色變化更平滑 */
+            transition: color 0.2s ease;
+            /* 讓滑鼠懸停時的顏色變化更平滑 */
         }
-      
+
         /* 當滑鼠移到超連結上方時的視覺效果 */
-        .project-link:hover 
-        {
-            color: #0056b3;               /* 變成深藍色 */
-            text-decoration: none;          /* 移除超連結下底線 */
-            /*text-decoration: underline;*/ /* 顯現下底線，提示使用者可點擊 */
+        .project-link:hover {
+            color: #0056b3;
+            /* 變成深藍色 */
+            text-decoration: none;
+            /* 移除超連結下底線 */
+            /*text-decoration: underline;*/
+            /* 顯現下底線，提示使用者可點擊 */
         }
 
         /* 專案的簡短說明文字樣式 */
-        .project-desc 
-        {
+        .project-desc {
             display: block;
-            color: #000000;           /* 較淡的灰色，用於副標題或說明 */
+            color: #000000;
+            /* 較淡的灰色，用於副標題或說明 */
             font-size: 0.9rem;
             margin-top: 0.2rem;
         }
 
         /* 頁尾樣式 */
-        footer 
-        {
+        footer {
             text-align: center;
             padding: 2rem;
             color: #6a737d;
@@ -122,6 +140,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- 網頁頂部：主標題 -->
@@ -139,7 +158,7 @@
         <section class="category-section">
             <h2 class="category-title">🌌 物理模擬</h2>
             <ul class="link-list">
-                
+
                 <!-- 連結項目 1 -->
                 <li class="link-item">
                     <!-- 
@@ -149,7 +168,8 @@
                         如果是另一個資料夾，可以寫 href="./physics/pendulum.html"
                       - 🛠️ 目前先用 "javascript:void(0);" 代替，代表點了不會有反應，等你之後修改。
                     -->
-                    <a href="./物理模擬/渦流管/渦流館模擬.html" target="_blank" rel="noopener noreferrer" class="project-link">渦流管截面顆粒流模擬 (Vortex Tube)</a>
+                    <a href="./物理模擬/渦流管/渦流館模擬.html" target="_blank" rel="noopener noreferrer"
+                        class="project-link">渦流管截面顆粒流模擬 (Vortex Tube)</a>
                     <span class="project-desc">使用粒子流模擬渦流管內部空氣粒子運動軌跡，並用顏色區份速度，速度快代表溫度高。</span>
                 </li>
 
@@ -158,7 +178,7 @@
                     <a href="javascript:void(0);" class="project-link">萬有引力多體運動 (N-Body Simulation)</a>
                     <span class="project-desc">模擬多個星體在太空中受萬有引力相互影響的動態，包含碰撞融合機制。</span>
                 </li>
-                
+
             </ul>
         </section>
 
@@ -168,7 +188,7 @@
         <section class="category-section">
             <h2 class="category-title">🛠️ 程式小工具</h2>
             <ul class="link-list">
-                
+
                 <!-- 連結項目 1 -->
                 <li class="link-item">
                     <!-- 
@@ -176,8 +196,8 @@
                       - 如果你有些工具放在子資料夾，例如叫 tools/color-picker.html
                       - 你的 href 就可以寫成 href="tools/color-picker.html"
                     -->
-                    <a href="javascript:void(0);" class="project-link">網頁前端色碼擷取器</a>
-                    <span class="project-desc">快速轉換 HEX、RGB、HSL 顏色格式，並支援一鍵複製色碼與產生漸層配色。</span>
+                    <a href="./城市小工具/滑鼠鍵盤控制器/index.html" target="_blank" rel="noopener noreferrer" class="project-link">鍵盤滑鼠控制器</a>
+                    <span class="project-desc">用拖曳積木的方式寫程式，達到控制鍵盤與滑鼠的效果</span>
                 </li>
 
                 <!-- 連結項目 2 -->
@@ -197,4 +217,5 @@
     </footer>
 
 </body>
+
 </html>
