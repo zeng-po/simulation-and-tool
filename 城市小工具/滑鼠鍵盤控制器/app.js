@@ -54,7 +54,7 @@ function initBlockly() {
         grid: {
             spacing: 24,
             length: 4,
-            colour: '#232b3f',
+            colour: '#cbd5e1',
             snap: true
         },
         zoom: {
@@ -228,7 +228,34 @@ function setupUIListeners() {
         downloadFile(pyText, 'robo_macro.py', 'text/plain');
     });
 
-
+    // Download local_runner.py helper script
+    const btnDownloadRunner = document.getElementById('btnDownloadRunner');
+    if (btnDownloadRunner) {
+        btnDownloadRunner.addEventListener('click', () => {
+            try {
+                if (typeof RUNNER_BASE64 !== 'undefined') {
+                    const byteCharacters = atob(RUNNER_BASE64);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const file = new Blob([byteArray], {type: 'text/x-python'});
+                    
+                    const a = document.createElement("a");
+                    a.href = URL.createObjectURL(file);
+                    a.download = 'local_runner.py';
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                } else {
+                    alert('找不到本機輔助程式內容，請重試！');
+                }
+            } catch (e) {
+                console.error("下載失敗:", e);
+                alert('下載輔助程式失敗，請重新整理頁面後重試。');
+            }
+        });
+    }
 
     document.getElementById('btnClearLogs').addEventListener('click', () => {
         clearLogs();

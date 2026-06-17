@@ -150,7 +150,15 @@
                                         <pre><code>pip install pyautogui flask flask-cors pynput</code></pre>
                                     </li>
                                     <li>執行專案目錄下的連線輔助程式：
-                                        <pre><code>python local_runner.py</code></pre>
+                                        <div class="code-download-group">
+                                            <pre><code>python local_runner.py</code></pre>
+                                            <button id="btnDownloadRunner" class="btn btn-mini-download" title="下載 local_runner.py">
+                                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                                    <path fill="currentColor" d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
+                                                </svg>
+                                                下載 local_runner.py
+                                            </button>
+                                        </div>
                                     </li>
                                     <li>執行後，網頁將自動偵測並連線。當右上角狀態顯示為 <span style="color:var(--neon-green)">● PC
                                             控制器已連線</span> 時，即可點擊「<strong>PC 實機運行</strong>」！</li>
@@ -315,6 +323,7 @@
     </xml>
 
     <!-- Project Javascript files -->
+    <script src="runner_base64.js"></script>
     <script src="blocks.js"></script>
     <script src="app.js"></script>
 </body>
