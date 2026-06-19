@@ -774,3 +774,39 @@ ahkGen['control_forever'] = function(block) {
     }
 });
 
+// ==========================================
+// UNIFY CATEGORY BLOCK COLORS
+// ==========================================
+function overrideBlockColor(type, color) {
+    if (Blockly.Blocks[type]) {
+        const originalInit = Blockly.Blocks[type].init;
+        if (originalInit) {
+            Blockly.Blocks[type].init = function() {
+                originalInit.call(this);
+                this.setColour(color);
+            };
+        } else {
+            Blockly.Blocks[type].colour = color;
+        }
+    }
+}
+
+// Override built-in blocks to match the color of their respective categories
+// Flow Control (⏳ 流程控制): #ff9900
+overrideBlockColor('controls_repeat_ext', '#ff9900');
+
+// Logic & Conditions (💡 邏輯與判斷): #00e676
+overrideBlockColor('controls_if', '#00e676');
+overrideBlockColor('logic_compare', '#00e676');
+overrideBlockColor('logic_operation', '#00e676');
+overrideBlockColor('logic_boolean', '#00e676');
+
+// Math Operations (🔢 數學運算): #ffeb3b
+overrideBlockColor('math_number', '#ffeb3b');
+overrideBlockColor('math_arithmetic', '#ffeb3b');
+overrideBlockColor('math_random_int', '#ffeb3b');
+
+// Variables (📦 變數): #ff5722
+overrideBlockColor('variables_get', '#ff5722');
+overrideBlockColor('variables_set', '#ff5722');
+
